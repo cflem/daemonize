@@ -9,6 +9,10 @@ void q (char* m) {
     exit(1);
 }
 
+void qtoofewargs () {
+    q("[daemonize] Too few arguments.\nUsage: daemonize [--chdir] [--noclose] <command>");
+}
+
 char* lowerdup (char* a) {
     char* b = strdup(a);
     int i;
@@ -19,7 +23,7 @@ char* lowerdup (char* a) {
 }
 
 int main (int argc, char** argv) {
-    if (argc < 2) q("[daemonize] Too few arguments.\nUsage: daemonize [--chdir] [--noclose] <command>");
+    if (argc < 2) qtoofewargs();
     int i, cmdlen = 0, buff_size = 256, nochdir = 1, noclose = 0;
     char* buffer = malloc(buff_size);
     
@@ -41,6 +45,8 @@ int main (int argc, char** argv) {
         free(cmp);
     }
     buffer[cmdlen-1] = 0;
+    
+    if (cmdlen < 1) qtoofewargs();
 
     daemon(nochdir, noclose);
     system(buffer);
