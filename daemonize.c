@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
+#include <fcntl.h>
 
 const struct option longopts[] = {
   {"chdir", no_argument, NULL, 'd'},
@@ -102,14 +103,26 @@ int main (int argc, char** argv) {
     // Set up logs as appropriate
     int logs = options.stdlog || options.errlog;
     if (options.stdlog) {
-        dup2(fileno(options.stdlog), fileno(stdout));
+        dup2(fileno(options.stdlog), STDOUT_FILENO);
         fclose(options.stdlog);
     }
     if (options.errlog) {
-        dup2(fileno(options.errlog), fileno(stderr));
+        dup2(fileno(options.errlog), STDERR_FILENO);
         fclose(options.errlog);
     }
-    // TODO: close stdin, stderr, stdout and redirect to /dev/null if logging
+
+    if (logs && !options.noclose) {
+        int devnull_out = open("/dev/null", O_WRONLY);
+        int devnull_in = open("/dev/null", O_RDONLY);
+        if (!options.errlog)
+            dup2(devnull_out, STDERR_FILENO);
+        if (!options.stdlog)
+            dup2(devnull_out, STDOUT_FILENO);
+        dup2(devnull_in, STDIN_FILENO);
+        close(devnull_in);
+        close(devnull_out);
+    }
+
     daemon(options.nochdir, options.noclose | logs);
     system(buffer);
 }
