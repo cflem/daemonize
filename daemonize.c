@@ -72,8 +72,8 @@ void parseargs(int argc, char** argv, struct opts* savedopts) {
                 if (!savedopts->errlog) q("[daemonize] Unable to open stderr log, quitting.");
                 break;
             default:
-                // just let getopt print the error
-                break;
+                // getopt will have printed an error already
+                qusage();
     }
   }
 }
@@ -87,7 +87,7 @@ int main (int argc, char** argv) {
 
     while (optind < argc) {
         int arglen = strlen(argv[optind]);
-        if (cmdlen+arglen+1 > buff_size) {
+        while (cmdlen+arglen+1 > buff_size) {
             buff_size *= 2;
             buffer = realloc(buffer, buff_size);
             if (buffer == NULL) q("[daemonize] Out of memory parsing arguments.");
