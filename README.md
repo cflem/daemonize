@@ -13,10 +13,14 @@ curl -s https://raw.githubusercontent.com/cflems/daemonize/master/daemonize.c | 
 
 ### Usage
 ```bash
-daemonize <command> [--chdir] [--noclose]
+daemonize <command> [-d|--chdir] [-n|--noclose] [-1|--log-stdout <logfile>] [-2|--log-stderr <logfile>]
 ```
 __command__: *(Required)* The command to execute as a daemon.
 
-__noclose__: *(Optional)* Leaves streams to the current terminal session open.
+__--noclose__: *(Optional)* Leaves input and output streams to the current terminal session open. Individual streams are overridden with logging options.
 
-__chdir__: *(Optional)* Changes directory to / before executing <command>
+__--chdir__: *(Optional)* Changes directory to / before executing <command>
+
+__--log-stdout <logfile>__: *(Optional)* Reroutes the program's stdout to the given file before daemonizing.
+
+__--log-stderr <logfile>__: *(Optional)* Reroutes the program's stderr to the given file before daemonizing.
