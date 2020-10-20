@@ -124,5 +124,7 @@ int main (int argc, char** argv) {
     }
 
     daemon(options.nochdir, options.noclose | logs);
-    system(buffer);
+
+    char* args[] = {"/bin/sh", "-c", buffer, NULL};
+    execv(args[0], args);
 }
