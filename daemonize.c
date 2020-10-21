@@ -89,15 +89,18 @@ int main (int argc, char** argv) {
         int arglen = strlen(argv[optind]);
         while (cmdlen+arglen+1 > buff_size) {
             buff_size *= 2;
-            buffer = realloc(buffer, buff_size);
-            if (buffer == NULL) q("[daemonize] Out of memory parsing arguments.");
         }
+        buffer = realloc(buffer, buff_size);
+        if (buffer == NULL) q("[daemonize] Out of memory parsing arguments.");
         strncpy(&buffer[cmdlen], argv[optind++], arglen);
         cmdlen += arglen+1;
         buffer[cmdlen-1] = ' ';
     }
+    
     buffer[cmdlen-1] = 0;
-
+    char cmd[cmdlen];
+    memcpy(cmd, buffer, cmdlen);
+    free(buffer);
     if (cmdlen < 1) qtoofewargs();
 
     // Set up logs as appropriate
@@ -125,6 +128,6 @@ int main (int argc, char** argv) {
 
     daemon(options.nochdir, options.noclose | logs);
 
-    char* args[] = {"/bin/sh", "-c", buffer, NULL};
+    char* args[] = {"/bin/sh", "-c", cmd, NULL};
     execv(args[0], args);
 }
